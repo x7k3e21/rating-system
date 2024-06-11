@@ -1,0 +1,6 @@
+
+# Exclude NPM lockfile
+package-lock.json
+
+# Exclude node_modules
+node_modules/

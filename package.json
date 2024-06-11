@@ -1,0 +1,14 @@
+{
+  "name": "liceum_rating",
+  "version": "1.0.0",
+  "main": "server/server.js",
+  "scripts": {
+    "server.start": "node server/server.js",
+    "server.debug": "node -r dotenv/config server/server.js"
+  },
+  "author": "x7k3e21",
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "prettier": "^3.3.2"
+  }
+}
