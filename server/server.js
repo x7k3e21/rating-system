@@ -20,6 +20,10 @@ application.use(handlerRoute);
 
 application.set("view engine", "hbs");
 
+const bodyParser = require("body-parser");
+
+const URLencodedParser = bodyParser.urlencoded({extended: false});
+
 const mongodb = require("mongodb");
 
 const MONGODB_ADDRESS = process.env.MONGODB_ADDRESS || "127.0.0.1";
@@ -53,6 +57,20 @@ function mongodbAddStudent() {
 
 application.get("/", (request, response) => {
     response.send("Hello, world!");
+});
+
+application.get("/addUser", (request, response) => {
+    response.sendFile(__dirname + "/static/addUser.html");
+});
+
+application.post("/addUser", URLencodedParser, (request, response) => {
+    if(!request.body) {
+        return response.sendStatus(400);
+    }
+    
+    console.log(request.body);
+
+    response.redirect("back");
 });
 
 const SERVER_PORT = process.env.SERVER_PORT || 3030;
