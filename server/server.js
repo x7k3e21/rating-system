@@ -20,6 +20,8 @@ application.use(handlerRoute);
 
 application.set("view engine", "hbs");
 
+application.set("views", __dirname + "/views");
+
 const bodyParser = require("body-parser");
 
 const URLencodedParser = bodyParser.urlencoded({extended: false});
@@ -45,9 +47,9 @@ async function dbPingDatabase(database) {
 
 dbPingDatabase(mongoDatabase);
 
-const MONGODB_COLLECTION_STUDENTS = "students";
+const MONGODB_COLLECTION_RATING = "rating";
 
-const mongodbCollectionStudents = mongoDatabase.collection(MONGODB_COLLECTION_STUDENTS);
+const mongodbCollectionRating = mongoDatabase.collection(MONGODB_COLLECTION_RATING);
 
 application.get("/", (request, response) => {
     response.send("Hello, world!");
@@ -71,7 +73,7 @@ application.post("/addUser", URLencodedParser, async (request, response) => {
         rating: 0
     };
 
-    const appendRequestResult = await mongodbCollectionStudents.insertOne(newUser);
+    const appendRequestResult = await mongodbCollectionRating.insertOne(newUser);
 
     console.log(appendRequestResult);
 
@@ -87,7 +89,7 @@ application.post("/updateRating", URLencodedParser, async (request, response) =>
         return response.sendStatus(400);
     }
 
-    const updateResult = await mongodbCollectionStudents.findOneAndUpdate(
+    const updateResult = await mongodbCollectionRating.findOneAndUpdate(
         {id: request.body.userTicketID}, 
         {$inc: {rating: Number(request.body.ratingChange)}}
     );
@@ -95,6 +97,25 @@ application.post("/updateRating", URLencodedParser, async (request, response) =>
     console.log(updateResult);
 
     response.redirect("back");
+});
+
+function compareStudents(user1, user2) {
+    if (user1.rating > user2.rating) {
+        return -1;
+    }
+    if(user1.rating < user2.rating) {
+        return 1;
+    }
+
+    return 0;
+}
+
+application.get("/rating", async (request, response) => {
+    let allStudents = await mongodbCollectionRating.find({}).toArray()
+    
+    allStudents = allStudents.sort(compareStudents);
+
+    response.render("rating.hbs", {studentsList: allStudents})
 });
 
 const SERVER_PORT = process.env.SERVER_PORT || 3030;
