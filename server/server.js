@@ -29,6 +29,28 @@ const mongoConnection = `mongodb://${MONGODB_ADDRESS}:${MONGODB_PORT}`;
 
 const mongoClient = new mongodb.MongoClient(mongoConnection);
 
+const MONGODB_DBNAME = "liceum";
+
+const mongoDatabase = mongoClient.db(MONGODB_DBNAME);
+
+async function dbPingDatabase(database) {
+    const dbPingResult = await database.command({ping: 1});
+
+    console.log(dbPingResult);
+}
+
+dbPingDatabase(mongoDatabase);
+
+const MONGODB_COLLECTION_STUDENTS = "students";
+const MONGODB_COLLECTION_RATING = "rating";
+
+const mongodbCollectionStudents = mongoDatabase.collection(MONGODB_COLLECTION_STUDENTS);
+const mongodbCollectionRating = mongoDatabase.collection(MONGODB_COLLECTION_RATING);
+
+function mongodbAddStudent() {
+
+}
+
 application.get("/", (request, response) => {
     response.send("Hello, world!");
 });
