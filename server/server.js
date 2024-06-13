@@ -46,14 +46,8 @@ async function dbPingDatabase(database) {
 dbPingDatabase(mongoDatabase);
 
 const MONGODB_COLLECTION_STUDENTS = "students";
-const MONGODB_COLLECTION_RATING = "rating";
 
 const mongodbCollectionStudents = mongoDatabase.collection(MONGODB_COLLECTION_STUDENTS);
-const mongodbCollectionRating = mongoDatabase.collection(MONGODB_COLLECTION_RATING);
-
-function mongodbAddStudent() {
-
-}
 
 application.get("/", (request, response) => {
     response.send("Hello, world!");
@@ -63,12 +57,42 @@ application.get("/addUser", (request, response) => {
     response.sendFile(__dirname + "/static/addUser.html");
 });
 
-application.post("/addUser", URLencodedParser, (request, response) => {
-    if(!request.body) {
+application.post("/addUser", URLencodedParser, async (request, response) => {
+    if(!request.body.userName || !request.body.userMidname || !request.body.userSurname || !request.body.userTicketID || !request.body.userGrade) {
         return response.sendStatus(400);
     }
-    
-    console.log(request.body);
+
+    const newUser = {
+        id: request.body.userTicketID,
+        surname: request.body.userSurname,
+        name: request.body.userName,
+        midname: request.body.userMidname,
+        grade: request.body.userGrade,
+        rating: 0
+    };
+
+    const appendRequestResult = await mongodbCollectionStudents.insertOne(newUser);
+
+    console.log(appendRequestResult);
+
+    response.redirect("back");
+});
+
+application.get("/updateRating", (request, response) => {
+    response.sendFile(__dirname + "/static/updateRating.html");
+});
+
+application.post("/updateRating", URLencodedParser, async (request, response) => {
+    if(!request.body.userTicketID || !request.body.ratingChange) {
+        return response.sendStatus(400);
+    }
+
+    const updateResult = await mongodbCollectionStudents.findOneAndUpdate(
+        {id: request.body.userTicketID}, 
+        {$inc: {rating: Number(request.body.ratingChange)}}
+    );
+
+    console.log(updateResult);
 
     response.redirect("back");
 });
